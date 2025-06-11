@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "id": "1749658502085",
+      "name": "dev",
+      "email": "dev@gmail.com",
+      "password": "$2b$10$3V4aoC0vAsjZsFVAYZ.qg.n/P0SshnMjk5vKKqBUbebKbFaSIJpM.",
+      "userType": "student",
+      "createdAt": "2025-06-11T16:15:02.086Z"
+    },
+    {
+      "id": "1749658768552",
+      "name": "Devanshu",
+      "email": "Dev@gmail.com",
+      "password": "$2b$10$/PO55JqCvkvb5wAlVA9Dg.pC7Na/8RUDXw/K3/YdIHC.5IVz.Uiy6",
+      "userType": "student",
+      "createdAt": "2025-06-11T16:19:28.552Z"
+    }
+  ]
+}
