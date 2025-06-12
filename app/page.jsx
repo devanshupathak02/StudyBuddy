@@ -6,12 +6,14 @@ import Footer from "../components/footer"
 import HeroSection from "../components/hero-section"
 import FeatureCards from "../components/feature-cards"
 import AuthModal from "../components/auth-modal"
+import ChatInterface from "../components/chat-interface"
 import { Toaster } from 'react-hot-toast'
 
 export default function HomePage() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState("login") // 'login' or 'signup'
   const [user, setUser] = useState(null)
+  const [showChat, setShowChat] = useState(false)
 
   const handleAuthClick = (mode) => {
     setAuthMode(mode)
@@ -27,6 +29,16 @@ export default function HomePage() {
     setUser(null)
   }
 
+  const handleFeatureClick = (featureId) => {
+    if (featureId === 1) {
+      if (user) {
+        setShowChat(true)
+      } else {
+        handleAuthClick("login")
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <Toaster position="top-center" />
@@ -34,7 +46,7 @@ export default function HomePage() {
 
       <main className="pt-20">
         <HeroSection onGetStarted={() => handleAuthClick("signup")} user={user} />
-        <FeatureCards />
+        <FeatureCards user={user} onAuthClick={handleAuthClick} onFeatureClick={handleFeatureClick} />
 
         {/* Call to Action Section */}
         {!user && (
@@ -75,6 +87,8 @@ export default function HomePage() {
           onAuthSuccess={handleAuthSuccess}
         />
       )}
+
+      <ChatInterface isOpen={showChat} onClose={() => setShowChat(false)} />
     </div>
   )
 }
