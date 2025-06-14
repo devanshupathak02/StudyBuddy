@@ -105,17 +105,21 @@ export default function AuthModal({ mode, onClose, onSwitchMode, onAuthSuccess }
 
             {/* Name Field (Sign Up Only) */}
             {mode === "signup" && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Full Name</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200"
-                    placeholder="Enter your full name"
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Enter your name"
                     required
                   />
                 </div>
@@ -123,16 +127,20 @@ export default function AuthModal({ mode, onClose, onSwitchMode, onAuthSuccess }
             )}
 
             {/* Email Field */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Email Address</label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Enter your email"
                   required
                 />
@@ -140,25 +148,33 @@ export default function AuthModal({ mode, onClose, onSwitchMode, onAuthSuccess }
             </div>
 
             {/* Password Field */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Password</label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200"
+                  className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Enter your password"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
                 </button>
               </div>
             </div>
@@ -167,38 +183,37 @@ export default function AuthModal({ mode, onClose, onSwitchMode, onAuthSuccess }
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className={`w-full py-3 px-4 rounded-xl text-white font-medium transition-all duration-200 ${
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transform hover:scale-105"
+              }`}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Please wait...</span>
-                </div>
-              ) : mode === "login" ? (
-                "Sign In ✨"
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
               ) : (
-                "Create Account 🚀"
+                mode === "login" ? "Sign In" : "Create Account"
               )}
             </button>
-          </form>
 
-          {/* Switch Mode */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              {mode === "login" ? "Don't have an account?" : "Already have an account?"}
+            {/* Switch Mode */}
+            <div className="text-center text-sm text-gray-600">
+              {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
               <button
-                onClick={() => onSwitchMode(mode === "login" ? "signup" : "login")}
-                className="ml-2 text-purple-600 font-semibold hover:text-purple-800 transition-colors duration-200"
+                type="button"
+                onClick={onSwitchMode}
+                className="text-purple-600 hover:text-purple-800 font-medium"
               >
                 {mode === "login" ? "Sign Up" : "Sign In"}
               </button>
-            </p>
-          </div>
-
-          {/* Social Login Options */}
-
-          
-          {/* in future we will add social login options */}
+            </div>
+          </form>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import "./globals.css"
+import { AuthProvider } from "@/contexts/auth-context"
 
 export const metadata = {
   title: "StudyBuddy AI - Your Smart Study Companion",
@@ -10,7 +11,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }

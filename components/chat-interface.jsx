@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Send, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
-export default function ChatInterface({ isOpen, onClose }) {
+export default function ChatInterface({ user, onClose }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -69,8 +69,6 @@ export default function ChatInterface({ isOpen, onClose }) {
       setIsLoading(false)
     }
   }
-
-  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">

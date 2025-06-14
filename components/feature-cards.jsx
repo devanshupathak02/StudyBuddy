@@ -115,7 +115,7 @@ export default function FeatureCards({ user, onAuthClick, onFeatureClick }) {
   ]
 
   return (
-    <section className="py-16 px-4">
+    <section id="features" className="py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
           Powerful Features to Enhance Your Learning

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from 'next/navigation'
 import Navbar from "../components/navbar"
 import Footer from "../components/footer"
 import HeroSection from "../components/hero-section"
@@ -8,11 +9,13 @@ import FeatureCards from "../components/feature-cards"
 import AuthModal from "../components/auth-modal"
 import ChatInterface from "../components/chat-interface"
 import { Toaster } from 'react-hot-toast'
+import { useAuth } from "@/contexts/auth-context"
 
 export default function HomePage() {
+  const router = useRouter()
+  const { user, login, logout } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState("login") // 'login' or 'signup'
-  const [user, setUser] = useState(null)
   const [showChat, setShowChat] = useState(false)
 
   const handleAuthClick = (mode) => {
@@ -21,74 +24,50 @@ export default function HomePage() {
   }
 
   const handleAuthSuccess = (userData) => {
-    setUser(userData)
+    login(userData)
     setShowAuthModal(false)
   }
 
   const handleLogout = () => {
-    setUser(null)
+    logout()
   }
 
   const handleFeatureClick = (featureId) => {
-    if (featureId === 1) {
-      if (user) {
+    if (!user) {
+      handleAuthClick("login")
+      return
+    }
+
+    switch (featureId) {
+      case 1: // AI Teaching Assistant
         setShowChat(true)
-      } else {
-        handleAuthClick("login")
-      }
+        break
+      case 2: // Smart Study Planner
+        router.push('/study-planner')
+        break
+      default:
+        break
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      <Toaster position="top-center" />
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <Navbar onAuthClick={handleAuthClick} user={user} onLogout={handleLogout} />
-
-      <main className="pt-20">
-        <HeroSection onGetStarted={() => handleAuthClick("signup")} user={user} />
-        <FeatureCards user={user} onAuthClick={handleAuthClick} onFeatureClick={handleFeatureClick} />
-
-        {/* Call to Action Section */}
-        {!user && (
-          <section className="py-16 px-4 bg-gradient-to-r from-purple-100 to-pink-100">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="bg-white rounded-3xl p-8 shadow-lg border-4 border-purple-200">
-                <h2 className="text-3xl font-bold text-purple-800 mb-4">Ready to Start Learning? 🚀</h2>
-                <p className="text-gray-600 mb-6 text-lg">
-                  Join thousands of students already using our AI Teaching Assistant!
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={() => handleAuthClick("signup")}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
-                  >
-                    Sign Up Free ✨
-                  </button>
-                  <button
-                    onClick={() => handleAuthClick("login")}
-                    className="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold text-lg border-2 border-purple-300 hover:bg-purple-50 transform hover:scale-105 transition-all duration-200"
-                  >
-                    Already Have Account? 👋
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-      </main>
-
+      <HeroSection onGetStarted={() => handleAuthClick("signup")} user={user} />
+      <FeatureCards user={user} onAuthClick={handleAuthClick} onFeatureClick={handleFeatureClick} />
       <Footer />
-
       {showAuthModal && (
         <AuthModal
           mode={authMode}
           onClose={() => setShowAuthModal(false)}
-          onSwitchMode={(mode) => setAuthMode(mode)}
+          onSwitchMode={() => setAuthMode(authMode === "login" ? "signup" : "login")}
           onAuthSuccess={handleAuthSuccess}
         />
       )}
-
-      <ChatInterface isOpen={showChat} onClose={() => setShowChat(false)} />
+      {showChat && user && (
+        <ChatInterface user={user} onClose={() => setShowChat(false)} />
+      )}
+      <Toaster position="top-center" />
     </div>
   )
 }

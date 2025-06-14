@@ -1,15 +1,47 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X, Bot, Home, Star, Mail, LogOut, User } from "lucide-react"
+import { Menu, X, Bot, Home, Star, Mail, LogOut, User, Calendar } from "lucide-react"
+import Link from "next/link"
 
 export default function Navbar({ onAuthClick, user, onLogout }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const navLinks = [
-    { name: "Home", href: "#", icon: Home },
-    { name: "Features", href: "#features", icon: Star },
-    { name: "Contact", href: "#contact", icon: Mail },
+    { 
+      name: "Home", 
+      href: "/", 
+      icon: Home, 
+      onClick: (e) => {
+        e.preventDefault()
+        window.scrollTo(0, 0)
+      }
+    },
+    { name: "Study Planner", href: "/study-planner", icon: Calendar },
+    { 
+      name: "Features", 
+      href: "#features", 
+      icon: Star,
+      onClick: (e) => {
+        e.preventDefault()
+        const featuresSection = document.getElementById('features')
+        if (featuresSection) {
+          featuresSection.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+    },
+    { 
+      name: "Contact", 
+      href: "#contact", 
+      icon: Mail,
+      onClick: (e) => {
+        e.preventDefault()
+        const footerSection = document.querySelector('footer')
+        if (footerSection) {
+          footerSection.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+    },
   ]
 
   return (
@@ -29,14 +61,15 @@ export default function Navbar({ onAuthClick, user, onLogout }) {
             {navLinks.map((link) => {
               const IconComponent = link.icon
               return (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
+                  onClick={link.onClick}
                   className="flex items-center space-x-1 text-gray-700 hover:text-purple-600 transition-colors duration-200 font-medium"
                 >
                   <IconComponent className="h-4 w-4" />
                   <span>{link.name}</span>
-                </a>
+                </Link>
               )
             })}
           </div>
@@ -98,15 +131,18 @@ export default function Navbar({ onAuthClick, user, onLogout }) {
               {navLinks.map((link) => {
                 const IconComponent = link.icon
                 return (
-                  <a
+                  <Link
                     key={link.name}
                     href={link.href}
+                    onClick={(e) => {
+                      if (link.onClick) link.onClick(e)
+                      setIsMenuOpen(false)
+                    }}
                     className="flex items-center space-x-2 text-gray-700 hover:text-purple-600 hover:bg-purple-50 block px-3 py-2 rounded-xl font-medium transition-all duration-200"
-                    onClick={() => setIsMenuOpen(false)}
                   >
                     <IconComponent className="h-4 w-4" />
                     <span>{link.name}</span>
-                  </a>
+                  </Link>
                 )
               })}
               <div className="flex flex-col space-y-2 pt-4 border-t border-purple-200">
