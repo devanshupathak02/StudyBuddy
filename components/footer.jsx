@@ -10,8 +10,8 @@ export default function Footer() {
     ],
     Contact: [
       { name: "support@studybuddy.ai", href: "mailto:support@studybuddy.ai", icon: Mail },
-      { name: "+1 (555) 123-4567", href: "tel:+15551234567", icon: Phone },
-      { name: "Noida, India", href: "#", icon: MapPin },
+      { name: "+91 (639) 562-8610", href: "tel:+916395628610", icon: Phone },
+      { name: "Mathura, India", href: "#", icon: MapPin },
     ],
   }
 
