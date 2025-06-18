@@ -8,6 +8,7 @@ import HeroSection from "../components/hero-section"
 import FeatureCards from "../components/feature-cards"
 import AuthModal from "../components/auth-modal"
 import ChatInterface from "../components/chat-interface"
+import QuizInterface from "../components/quiz-interface"
 import { Toaster } from 'react-hot-toast'
 import { useAuth } from "@/contexts/auth-context"
 
@@ -17,6 +18,7 @@ export default function HomePage() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState("login") // 'login' or 'signup'
   const [showChat, setShowChat] = useState(false)
+  const [showQuiz, setShowQuiz] = useState(false)
 
   const handleAuthClick = (mode) => {
     setAuthMode(mode)
@@ -42,7 +44,10 @@ export default function HomePage() {
       case 1: // AI Teaching Assistant
         setShowChat(true)
         break
-      case 2: // Progress Tracking
+      case 2: // AI Self-Assessment Quiz
+        setShowQuiz(true)
+        break
+      case 3: // Progress Tracking
         // TODO: Implement progress tracking feature
         console.log("Progress tracking feature coming soon!")
         break
@@ -67,6 +72,9 @@ export default function HomePage() {
       )}
       {showChat && user && (
         <ChatInterface user={user} onClose={() => setShowChat(false)} />
+      )}
+      {showQuiz && user && (
+        <QuizInterface user={user} onClose={() => setShowQuiz(false)} />
       )}
       <Toaster position="top-center" />
     </div>

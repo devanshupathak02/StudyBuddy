@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCircle, TrendingUp, Lock } from "lucide-react"
+import { MessageCircle, TrendingUp, Lock, Brain } from "lucide-react"
 
 function FeatureCard({ feature, user, onFeatureClick }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -82,6 +82,22 @@ export default function FeatureCards({ user, onAuthClick, onFeatureClick }) {
     },
     {
       id: 2,
+      title: "AI Self-Assessment Quiz",
+      description: "Test your knowledge with AI-generated personalized quizzes. Get instant feedback, track your progress, and identify areas for improvement.",
+      icon: Brain,
+      emoji: "🧠",
+      color: "from-orange-500 to-red-500",
+      buttonColor: "from-orange-500 to-red-500",
+      bgColor: "bg-orange-50",
+      details: [
+        "AI-generated personalized questions",
+        "Instant feedback and explanations",
+        "Progress tracking and analytics",
+        "Adaptive difficulty levels",
+      ],
+    },
+    {
+      id: 3,
       title: "Progress Tracking",
       description: "Monitor your learning progress with detailed analytics and insights. Celebrate your achievements and identify areas for improvement.",
       icon: TrendingUp,
@@ -104,7 +120,7 @@ export default function FeatureCards({ user, onAuthClick, onFeatureClick }) {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
           Powerful Features to Enhance Your Learning
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature) => (
             <FeatureCard
               key={feature.id}
