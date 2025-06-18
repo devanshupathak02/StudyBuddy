@@ -42,8 +42,9 @@ export default function HomePage() {
       case 1: // AI Teaching Assistant
         setShowChat(true)
         break
-      case 2: // Smart Study Planner
-        router.push('/study-planner')
+      case 2: // Progress Tracking
+        // TODO: Implement progress tracking feature
+        console.log("Progress tracking feature coming soon!")
         break
       default:
         break

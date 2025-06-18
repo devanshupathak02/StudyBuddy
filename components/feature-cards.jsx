@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCircle, FileCheck, TrendingUp, Lock } from "lucide-react"
+import { MessageCircle, TrendingUp, Lock } from "lucide-react"
 
 function FeatureCard({ feature, user, onFeatureClick }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -82,22 +82,6 @@ export default function FeatureCards({ user, onAuthClick, onFeatureClick }) {
     },
     {
       id: 2,
-      title: "Smart Study Planner",
-      description: "Create personalized study schedules that adapt to your learning style and goals. Stay organized and maximize your study time.",
-      icon: FileCheck,
-      emoji: "📅",
-      color: "from-pink-500 to-red-500",
-      buttonColor: "from-pink-500 to-red-500",
-      bgColor: "bg-pink-50",
-      details: [
-        "Personalized study schedules",
-        "Adaptive learning paths",
-        "Progress tracking",
-        "Smart reminders",
-      ],
-    },
-    {
-      id: 3,
       title: "Progress Tracking",
       description: "Monitor your learning progress with detailed analytics and insights. Celebrate your achievements and identify areas for improvement.",
       icon: TrendingUp,
@@ -120,7 +104,7 @@ export default function FeatureCards({ user, onAuthClick, onFeatureClick }) {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
           Powerful Features to Enhance Your Learning
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {features.map((feature) => (
             <FeatureCard
               key={feature.id}
