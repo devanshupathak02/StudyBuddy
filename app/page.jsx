@@ -45,7 +45,7 @@ export default function HomePage() {
         setShowChat(true)
         break
       case 2: // AI Self-Assessment Quiz
-        setShowQuiz(true)
+        router.push('/quiz')
         break
       case 3: // Progress Tracking
         // TODO: Implement progress tracking feature
@@ -72,9 +72,6 @@ export default function HomePage() {
       )}
       {showChat && user && (
         <ChatInterface user={user} onClose={() => setShowChat(false)} />
-      )}
-      {showQuiz && user && (
-        <QuizInterface user={user} onClose={() => setShowQuiz(false)} />
       )}
       <Toaster position="top-center" />
     </div>
