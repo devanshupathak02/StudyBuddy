@@ -85,6 +85,102 @@
   .input-cartoon {
     @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none transition-colors duration-200;
   }
+
+  /* Chat Interface Styles */
+  .chat-message {
+    @apply transition-all duration-200;
+  }
+
+  .chat-message:hover {
+    @apply transform scale-[1.02];
+  }
+
+  /* Markdown Styles */
+  .prose {
+    @apply text-gray-800 leading-relaxed;
+  }
+
+  .prose h1 {
+    @apply text-2xl font-bold text-gray-800 mt-6 mb-4 border-b border-gray-200 pb-2;
+  }
+
+  .prose h2 {
+    @apply text-xl font-bold text-gray-800 mt-6 mb-3;
+  }
+
+  .prose h3 {
+    @apply text-lg font-bold text-gray-800 mt-4 mb-2;
+  }
+
+  .prose p {
+    @apply mb-3 leading-relaxed;
+  }
+
+  .prose strong {
+    @apply font-bold text-gray-900;
+  }
+
+  .prose em {
+    @apply italic text-gray-700;
+  }
+
+  .prose code {
+    @apply bg-gray-100 px-2 py-1 rounded text-sm font-mono text-purple-700;
+  }
+
+  .prose a {
+    @apply text-blue-600 hover:text-blue-800 underline transition-colors duration-200;
+  }
+
+  .prose ul {
+    @apply list-disc list-inside mb-4 space-y-1;
+  }
+
+  .prose ol {
+    @apply list-decimal list-inside mb-4 space-y-1;
+  }
+
+  .prose li {
+    @apply mb-1;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-purple-300 pl-4 italic text-gray-600 my-4;
+  }
+
+  /* Code Block Styles */
+  .code-block {
+    @apply my-4 bg-gray-900 rounded-lg overflow-hidden shadow-lg;
+  }
+
+  .code-block-header {
+    @apply flex items-center justify-between bg-gray-800 px-4 py-2;
+  }
+
+  .code-block-content {
+    @apply p-4 overflow-x-auto;
+  }
+
+  .code-block-content code {
+    @apply text-green-400 font-mono text-sm leading-relaxed;
+  }
+
+  /* Loading Animation */
+  .loading-dots {
+    @apply flex space-x-2;
+  }
+
+  .loading-dots > div {
+    @apply w-3 h-3 bg-purple-500 rounded-full animate-bounce;
+  }
+
+  .loading-dots > div:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .loading-dots > div:nth-child(3) {
+    animation-delay: 0.2s;
+  }
 }
 
 @layer utilities {
@@ -119,6 +215,19 @@
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-purple-300 rounded-full hover:bg-purple-400;
+  }
+
+  /* Chat scrollbar */
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400;
   }
 }
 
@@ -204,6 +313,108 @@
 }
 
 .calendar-container .rdp-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-container .rdp-caption_label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.calendar-container .rdp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calendar-container .rdp-tbody {
+  width: 100%;
+}
+
+.calendar-container .rdp-tr {
+  width: 100%;
+}
+
+.calendar-container .rdp-td {
+  width: var(--rdp-cell-size);
+  height: var(--rdp-cell-size);
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.calendar-container .rdp-button:hover {
+  background-color: var(--rdp-background-color);
+  border-radius: 50%;
+}
+
+.calendar-container .rdp-button[aria-selected="true"] {
+  background-color: var(--rdp-accent-color);
+  color: white;
+  border-radius: 50%;
+}
+
+.calendar-container .rdp-button[aria-selected="true"]:hover {
+  background-color: #7c3aed;
+}
+
+.calendar-container .rdp-button[aria-selected="true"]:focus {
+  background-color: #7c3aed;
+}
+
+.calendar-container .rdp-button:focus {
+  outline: 2px solid var(--rdp-accent-color);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.calendar-container .rdp-button[disabled] {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.calendar-container .rdp-button[disabled]:hover {
+  background-color: transparent;
+}
+
+.calendar-container .rdp-head_cell {
+  width: var(--rdp-cell-size);
+  height: 32px;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 600;
   font-size: 0.875rem;
-  padding: 0.25rem 0;
+  color: #6b7280;
+}
+
+.calendar-container .rdp-head_row {
+  width: 100%;
+}
+
+.calendar-container .rdp-head {
+  width: 100%;
+}
+
+.calendar-container .rdp-head_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calendar-container .rdp-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-container .rdp-caption_label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #374151;
 }
