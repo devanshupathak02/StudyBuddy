@@ -18,20 +18,50 @@ export async function POST(req) {
     const genAI = new GoogleGenerativeAI(apiKey);
 
     // Parse the request body
-    const { message } = await req.json();
+    const { message, file } = await req.json();
 
-    if (!message) {
-      console.error('No message provided in request');
+    if (!message && !file) {
+      console.error('No message or file provided in request');
       return NextResponse.json(
-        { error: 'No message provided' },
+        { error: 'No message or file provided' },
         { status: 400 }
       );
     }
 
-    console.log('Sending request to Gemini:', message);
+    console.log('Sending request to Gemini with message:', message);
+
+    const userParts = [];
+
+    if (file) {
+      // file is a base64 data URL e.g. "data:image/png;base64,iVBORw0KGgo..."
+      try {
+        const file_parts = file.split(",");
+        const mime_type = file_parts[0].match(/:(.*?);/)[1];
+        const base64_data = file_parts[1];
+    
+        userParts.push({
+          inline_data: {
+            data: base64_data,
+            mime_type: mime_type,
+          }
+        });
+      } catch (e) {
+        console.error('Invalid file data format', e);
+        return NextResponse.json(
+          { error: 'Invalid file data format. Please provide a valid base64 data URL.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (message) {
+      userParts.push({ text: message });
+    }
 
     // Enhanced system prompt for better formatting
     const systemPrompt = `You are StudyBuddy AI, a friendly and knowledgeable teaching assistant. Your role is to help students with their studies by providing clear, well-structured, and engaging explanations.
+
+When a user uploads a file (image, PDF, or document), your primary task is to analyze its content and use it to answer the user's request. If the user asks a question about the file, provide a detailed answer based on the information within it. If they ask you to summarize it, provide a concise summary.
 
 IMPORTANT FORMATTING GUIDELINES:
 1. Use markdown formatting to make your responses visually appealing and easy to read
@@ -66,7 +96,7 @@ Remember: Your responses should be educational, well-formatted, and visually app
       contents: [
         { role: "user", parts: [{ text: systemPrompt }] },
         { role: "model", parts: [{ text: "I understand! I'm StudyBuddy AI, ready to help students with clear, well-formatted, and engaging explanations. I'll use markdown formatting, headers, lists, code blocks, and visual elements to make learning easier and more enjoyable. How can I help you today?" }] },
-        { role: "user", parts: [{ text: message }] }
+        { role: "user", parts: userParts }
       ],
     });
 
@@ -75,7 +105,7 @@ Remember: Your responses should be educational, well-formatted, and visually app
 
     console.log('Received response from Gemini:', text);
 
-    return NextResponse.json({ response: text });
+    return NextResponse.json({ message: text });
   } catch (error) {
     console.error('Detailed Chat API Error:', {
       message: error.message,

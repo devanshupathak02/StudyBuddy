@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, X, Bot, User, Copy, Check } from 'lucide-react'
+import { Send, X, Bot, User, Copy, Check, Paperclip, Image as ImageIcon, FileText } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
 // Simple markdown parser for basic formatting
@@ -111,6 +111,22 @@ const Message = ({ message, isUser }) => {
   // Check if content contains code blocks
   const hasCodeBlocks = message.content.includes('```');
   
+  const renderAttachment = () => {
+    if (!message.attachment) return null;
+    return (
+      <div className="mb-2">
+        {message.attachment.type === 'image' ? (
+          <img src={message.attachment.url} alt="User upload" className="rounded-lg max-h-60" />
+        ) : (
+          <div className={`flex items-center gap-2 p-2 rounded-lg ${isUser ? 'bg-white/20' : 'bg-gray-100'}`}>
+            <FileText className={`h-6 w-6 ${isUser ? 'text-white' : 'text-gray-500'}`} />
+            <span className={`text-sm ${isUser ? 'text-white' : 'text-gray-700'} truncate`}>{message.attachment.name}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (hasCodeBlocks) {
     // Split content by code blocks
     const parts = message.content.split(/(```[\s\S]*?```)/);
@@ -138,6 +154,7 @@ const Message = ({ message, isUser }) => {
                 : 'bg-white border-2 border-purple-100 shadow-lg'
             }`}
           >
+            {renderAttachment()}
             {parts.map((part, index) => {
               if (part.startsWith('```') && part.endsWith('```')) {
                 const code = part.slice(3, -3);
@@ -209,6 +226,7 @@ const Message = ({ message, isUser }) => {
               : 'bg-white border-2 border-purple-100 shadow-lg'
           }`}
         >
+          {renderAttachment()}
           <div 
             className="prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{ 
@@ -242,6 +260,9 @@ export default function ChatInterface({ user, onClose }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [file, setFile] = useState(null)
+  const [filePreview, setFilePreview] = useState(null)
+  const fileInputRef = useRef(null)
   const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {
@@ -252,55 +273,103 @@ export default function ChatInterface({ user, onClose }) {
     scrollToBottom()
   }, [messages])
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0]
+    if (selectedFile) {
+      if (selectedFile.size > 4 * 1024 * 1024) { // 4MB limit
+        toast.error('File size should be less than 4MB')
+        return
+      }
+      setFile(selectedFile)
+      if (selectedFile.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setFilePreview(reader.result)
+        }
+        reader.readAsDataURL(selectedFile)
+      } else {
+        setFilePreview(selectedFile.name)
+      }
+    }
+  }
+
+  const removeFile = () => {
+    setFile(null)
+    setFilePreview(null)
+    if(fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!input.trim()) return
+    if ((!input.trim() && !file) || isLoading) return
 
-    const userMessage = input.trim()
+    const userMessageContent = input.trim()
+    
+    // Prepare message for UI
+    let attachmentPreview = null
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        attachmentPreview = { type: 'image', url: filePreview }
+      } else {
+        attachmentPreview = { type: 'file', name: file.name }
+      }
+    }
+
+    const newUserMessage = { 
+      content: userMessageContent, 
+      isUser: true, 
+      attachment: attachmentPreview 
+    }
+    setMessages(prev => [...prev, newUserMessage])
     setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+    
     setIsLoading(true)
 
+    // Prepare request for backend
+    let fileDataUrl = null
+    if (file) {
+      fileDataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+    }
+
     try {
-      console.log('Sending message to API:', userMessage);
-      const response = await fetch('/api/chat', {
+      const requestBody = {
+        message: userMessageContent,
+        user: user,
+        file: fileDataUrl, // Renamed from image
+      };
+
+      const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userMessage }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
       })
 
-      const data = await response.json()
-      console.log('Received API response:', data);
-
-      if (response.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.response }])
-      } else {
-        console.error('Chat API Error:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: data.error,
-          details: data.details
-        });
-        
-        let errorMessage = 'Failed to get response from AI';
-        if (data.error) {
-          errorMessage = data.error;
-          if (data.details) {
-            errorMessage += ` (${data.details})`;
-          }
-        }
-        toast.error(errorMessage);
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Something went wrong')
       }
+
+      const data = await res.json()
+      const aiMessage = { content: data.message, isUser: false }
+      setMessages(prev => [...prev, aiMessage])
+
     } catch (error) {
-      console.error('Chat Error:', {
-        message: error.message,
-        stack: error.stack
-      });
-      toast.error('Connection error. Please check your internet connection and try again.');
+      console.error(error)
+      toast.error(error.message)
+      // Restore user input if API call fails
+      setMessages(prev => prev.slice(0, prev.length - 1))
+      setInput(userMessageContent)
+
     } finally {
       setIsLoading(false)
+      removeFile() // Clear file after exchange is complete
     }
   }
 
@@ -327,57 +396,55 @@ export default function ChatInterface({ user, onClose }) {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-2 bg-gradient-to-b from-gray-50 to-white chat-scrollbar">
-          {messages.length === 0 && (
-            <div className="text-center py-12">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Bot className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Welcome to StudyBuddy AI!</h3>
-              <p className="text-gray-500 max-w-md mx-auto">
-                I'm here to help you with your studies. Ask me questions about any subject, 
-                get explanations, or request help with homework!
-              </p>
-            </div>
-          )}
-          
+        <div className="flex-1 p-6 space-y-4 overflow-y-auto">
           {messages.map((message, index) => (
-            <div key={index} className="chat-message">
-              <Message 
-                message={message} 
-                isUser={message.role === 'user'} 
-              />
-            </div>
+            <Message 
+              key={index}
+              message={message}
+              isUser={message.isUser} 
+            />
           ))}
-          
-          {isLoading && (
-            <div className="flex justify-start mb-4">
-              <div className="relative max-w-[85%] order-1">
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-full">
-                    <Bot className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-600">AI Assistant</span>
-                </div>
-                <div className="bg-white border-2 border-purple-100 shadow-lg rounded-2xl p-4">
-                  <div className="loading-dots">
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">Thinking...</p>
-                </div>
-              </div>
-            </div>
-          )}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <form onSubmit={handleSubmit} className="p-6 border-t border-gray-200 bg-white">
-          <div className="flex space-x-3">
+        {/* Input Form */}
+        <div className="p-4 bg-white border-t-2 border-purple-100">
+          {filePreview && (
+            <div className="relative mb-2 w-max max-w-xs">
+              {file && file.type.startsWith('image/') ? (
+                <img src={filePreview} alt="Image preview" className="h-32 w-32 object-cover rounded-lg" />
+              ) : (
+                <div className="flex items-center gap-2 p-2 bg-gray-100 rounded-lg">
+                  <FileText className="h-6 w-6 text-gray-500" />
+                  <span className="text-sm text-gray-700 truncate">{filePreview}</span>
+                </div>
+              )}
+              <button
+                onClick={removeFile}
+                className="absolute -top-2 -right-2 bg-gray-900 bg-opacity-50 text-white rounded-full p-1 hover:bg-gray-800 transition-colors"
+                aria-label="Remove file"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="flex items-center space-x-2">
             <input
-              type="text"
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept="image/*,application/pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              className="p-2 text-gray-500 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              aria-label="Attach image"
+            >
+              <Paperclip className="h-5 w-5" />
+            </button>
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me anything about your studies..."
@@ -390,8 +457,8 @@ export default function ChatInterface({ user, onClose }) {
             >
               <Send className="h-5 w-5" />
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   )
